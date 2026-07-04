@@ -17,138 +17,102 @@
       <p class="eyebrow">Tour de France 2026</p>
       <h1>Fantasy Riders Database</h1>
     </div>
-    <div class="topbar-actions">
-      <button class="icon-button" id="downloadCsv" type="button" title="Descargar CSV filtrado" aria-label="Descargar CSV filtrado">
-        <span aria-hidden="true">CSV</span>
-      </button>
-      <button class="text-button" id="resetFilters" type="button">Limpiar filtros</button>
-    </div>
   </header>
 
   <main>
-    <section class="stats-grid" aria-label="Resumen de datos">
-      <article class="metric">
-        <span class="metric-label">Riders visibles</span>
-        <strong id="visibleCount">0</strong>
-      </article>
-      <article class="metric">
-        <span class="metric-label">Precio promedio</span>
-        <strong id="avgPrice">0</strong>
-      </article>
-      <article class="metric">
-        <span class="metric-label">Valor promedio</span>
-        <strong id="avgValue">0</strong>
-      </article>
-      <article class="metric">
-        <span class="metric-label">Top value</span>
-        <strong id="topValue">-</strong>
-      </article>
-    </section>
+    <section class="filters" aria-label="Filtros">
+      <div class="filters-heading">
+        <h2>Filters and Sorting</h2>
+        <span id="visibleCount">0</span>
+      </div>
 
-    <section class="workspace">
-      <aside class="filters" aria-label="Filtros">
-        <div class="filter-block">
-          <label for="searchInput">Buscar</label>
-          <input id="searchInput" type="search" placeholder="Nombre, equipo o dorsal">
+      <div class="filter-grid">
+        <div class="filter-block search-block">
+          <label for="searchInput">Riders</label>
+          <input id="searchInput" type="search" placeholder="Search rider, team, category or number">
         </div>
 
         <div class="filter-block">
-          <label for="teamFilter">Equipo</label>
-          <select id="teamFilter">
-            <option value="">Todos los equipos</option>
-          </select>
-        </div>
-
-        <div class="filter-block">
-          <label for="categoryFilter">Categoria</label>
+          <label for="categoryFilter">Category</label>
           <select id="categoryFilter">
-            <option value="">Todas las categorias</option>
+            <option value="">All categories</option>
           </select>
         </div>
 
         <div class="filter-block">
-          <label for="tierFilter">Tier</label>
-          <select id="tierFilter">
-            <option value="">Todos los tiers</option>
+          <label for="teamFilter">Team</label>
+          <select id="teamFilter">
+            <option value="">All teams</option>
           </select>
         </div>
 
-        <div class="filter-row">
-          <div class="filter-block">
-            <label for="minPrice">Precio min.</label>
-            <input id="minPrice" type="number" min="0" step="1">
-          </div>
-          <div class="filter-block">
-            <label for="maxPrice">Precio max.</label>
-            <input id="maxPrice" type="number" min="0" step="1">
-          </div>
+        <div class="filter-block number-block">
+          <label for="minPrice">Min. price</label>
+          <input id="minPrice" type="number" min="0" step="1">
         </div>
 
-        <div class="filter-row">
-          <div class="filter-block">
-            <label for="minValue">Value min.</label>
-            <input id="minValue" type="number" min="0" step="0.1">
-          </div>
-          <div class="filter-block">
-            <label for="maxValue">Value max.</label>
-            <input id="maxValue" type="number" min="0" step="0.1">
-          </div>
+        <div class="filter-block number-block">
+          <label for="maxPrice">Max. price</label>
+          <input id="maxPrice" type="number" min="0" step="1">
         </div>
 
         <div class="filter-block">
-          <label for="sortSelect">Ordenar por</label>
+          <label for="sortSelect">Sort by</label>
           <select id="sortSelect">
-            <option value="value-desc">Value: mayor a menor</option>
-            <option value="price-asc">Precio: menor a mayor</option>
-            <option value="price-desc">Precio: mayor a menor</option>
-            <option value="pcs-desc">PCS 2026: mayor a menor</option>
-            <option value="rank-asc">PCS Rank: mejor ranking</option>
-            <option value="jersey-asc">Dorsal: ascendente</option>
+            <option value="value-desc">Points/Credit (best)</option>
+            <option value="price-asc">Price: low to high</option>
+            <option value="price-desc">Price: high to low</option>
+            <option value="pcs-desc">PCS 2026: high to low</option>
+            <option value="rank-asc">PCS Rank: best</option>
+            <option value="jersey-asc">Race number</option>
             <option value="name-asc">Rider: A-Z</option>
           </select>
         </div>
-      </aside>
 
-      <section class="table-panel" aria-label="Tabla de riders">
-        <div class="table-toolbar">
-          <div>
-            <h2>Riders</h2>
-            <p id="activeFilters">Sin filtros activos</p>
-          </div>
-          <div class="legend">
-            <span><i class="tier-dot excellent"></i>Excellent</span>
-            <span><i class="tier-dot great"></i>Great</span>
-            <span><i class="tier-dot good"></i>Good</span>
-            <span><i class="tier-dot average"></i>Average</span>
-            <span><i class="tier-dot poor"></i>Poor</span>
-          </div>
+        <div class="filter-actions">
+          <button class="primary-button" id="downloadCsv" type="button">CSV</button>
+          <button class="clear-button" id="resetFilters" type="button" title="Clear filters" aria-label="Clear filters">X</button>
         </div>
+      </div>
+    </section>
 
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Dorsal</th>
-                <th>Rider</th>
-                <th>Equipo</th>
-                <th>Categoria</th>
-                <th>PCS 2026</th>
-                <th>PCS 12m</th>
-                <th>Wins</th>
-                <th>Value</th>
-                <th>Tier</th>
-                <th>Precio</th>
-                <th>PCS Rank</th>
-              </tr>
-            </thead>
-            <tbody id="ridersBody">
-              <tr>
-                <td colspan="11" class="loading">Cargando riders...</td>
-              </tr>
-            </tbody>
-          </table>
+    <section class="table-panel" aria-label="Tabla de riders">
+      <div class="table-toolbar">
+        <p id="activeFilters">No active filters</p>
+        <div class="legend">
+          <span><i class="tier-dot excellent"></i>Excellent</span>
+          <span><i class="tier-dot great"></i>Great</span>
+          <span><i class="tier-dot good"></i>Good</span>
+          <span><i class="tier-dot average"></i>Average</span>
+          <span><i class="tier-dot poor"></i>Poor</span>
         </div>
-      </section>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Dorsal</th>
+              <th>Rider</th>
+              <th>Equipo</th>
+              <th>Categoria</th>
+              <th>PCS 2026</th>
+              <th>PCS 12m</th>
+              <th>Wins</th>
+              <th>Value</th>
+              <th>Tier</th>
+              <th>Precio</th>
+              <th>PCS Rank</th>
+              <th>PCS</th>
+            </tr>
+          </thead>
+          <tbody id="ridersBody">
+            <tr>
+              <td colspan="12" class="loading">Cargando riders...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
   </main>
 

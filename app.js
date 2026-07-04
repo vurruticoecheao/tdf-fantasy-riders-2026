@@ -7,20 +7,14 @@ const fields = {
   search: document.querySelector("#searchInput"),
   team: document.querySelector("#teamFilter"),
   category: document.querySelector("#categoryFilter"),
-  tier: document.querySelector("#tierFilter"),
   minPrice: document.querySelector("#minPrice"),
   maxPrice: document.querySelector("#maxPrice"),
-  minValue: document.querySelector("#minValue"),
-  maxValue: document.querySelector("#maxValue"),
   sort: document.querySelector("#sortSelect"),
 };
 
 const els = {
   body: document.querySelector("#ridersBody"),
   visibleCount: document.querySelector("#visibleCount"),
-  avgPrice: document.querySelector("#avgPrice"),
-  avgValue: document.querySelector("#avgValue"),
-  topValue: document.querySelector("#topValue"),
   activeFilters: document.querySelector("#activeFilters"),
   reset: document.querySelector("#resetFilters"),
   download: document.querySelector("#downloadCsv"),
@@ -43,6 +37,13 @@ const tierClass = {
   Good: "good",
   Average: "average",
   Poor: "poor",
+};
+
+const categoryClass = {
+  Leaders: "category-leaders",
+  Climbers: "category-climbers",
+  Sprinters: "category-sprinters",
+  "All-rounders": "category-all-rounders",
 };
 
 function parseCsv(text) {
@@ -112,19 +113,14 @@ function filterRiders() {
   const query = fields.search.value.trim().toLowerCase();
   const minPrice = getNumber(fields.minPrice);
   const maxPrice = getNumber(fields.maxPrice);
-  const minValue = getNumber(fields.minValue);
-  const maxValue = getNumber(fields.maxValue);
 
   state.filtered = state.riders.filter((rider) => {
     const haystack = `${rider.Rider} ${rider.Team} ${rider.Category} ${rider.Tier} ${rider["Jersey Number"]}`.toLowerCase();
     if (query && !haystack.includes(query)) return false;
     if (fields.team.value && rider.Team !== fields.team.value) return false;
     if (fields.category.value && rider.Category !== fields.category.value) return false;
-    if (fields.tier.value && rider.Tier !== fields.tier.value) return false;
     if (minPrice !== null && rider.Price < minPrice) return false;
     if (maxPrice !== null && rider.Price > maxPrice) return false;
-    if (minValue !== null && rider.Value < minValue) return false;
-    if (maxValue !== null && rider.Value > maxValue) return false;
     return true;
   });
 
@@ -162,55 +158,47 @@ function formatNumber(value, decimals = 0) {
 }
 
 function render() {
-  renderStats();
+  renderCount();
   renderActiveFilters();
 
   if (!state.filtered.length) {
-    els.body.innerHTML = '<tr><td colspan="11" class="empty">No hay riders con esos filtros.</td></tr>';
+    els.body.innerHTML = '<tr><td colspan="12" class="empty">No hay riders con esos filtros.</td></tr>';
     return;
   }
 
   els.body.innerHTML = state.filtered.map((rider) => {
     const tier = tierClass[rider.Tier] || "average";
+    const category = categoryClass[rider.Category] || "";
     return `
       <tr>
         <td>${rider["Jersey Number"]}</td>
         <td class="rider-name">${rider.Rider}</td>
         <td class="team-cell">${rider.Team}</td>
-        <td><span class="pill">${rider.Category}</span></td>
+        <td><span class="pill ${category}">${rider.Category}</span></td>
         <td>${formatNumber(rider["PCS 2026"])}</td>
         <td>${formatNumber(rider["PCS 12 Months"])}</td>
         <td>${formatNumber(rider["Wins 2026"])}</td>
-        <td><strong>${formatNumber(rider.Value, 1)}</strong></td>
+        <td><span class="value-pill">${formatNumber(rider.Value, 1)}</span></td>
         <td><span class="pill tier-pill ${tier}">${rider.Tier}</span></td>
-        <td>${formatNumber(rider.Price)}</td>
-        <td>#${formatNumber(rider["PCS Rank"])}</td>
+        <td><span class="price-pill">${formatNumber(rider.Price)}</span></td>
+        <td><span class="rank-pill">#${formatNumber(rider["PCS Rank"])}</span></td>
+        <td><a class="link-button" href="${rider["PCS Link"]}" target="_blank" rel="noopener noreferrer">PCS</a></td>
       </tr>
     `;
   }).join("");
 }
 
-function renderStats() {
-  const visible = state.filtered.length;
-  const avgPrice = visible ? state.filtered.reduce((sum, rider) => sum + rider.Price, 0) / visible : 0;
-  const avgValue = visible ? state.filtered.reduce((sum, rider) => sum + rider.Value, 0) / visible : 0;
-  const top = state.filtered.reduce((best, rider) => !best || rider.Value > best.Value ? rider : best, null);
-
-  els.visibleCount.textContent = `${visible} / ${state.riders.length}`;
-  els.avgPrice.textContent = formatNumber(avgPrice, 1);
-  els.avgValue.textContent = formatNumber(avgValue, 1);
-  els.topValue.textContent = top ? `${top.Rider} (${formatNumber(top.Value, 1)})` : "-";
+function renderCount() {
+  els.visibleCount.textContent = `${state.filtered.length} / ${state.riders.length} riders`;
 }
 
 function renderActiveFilters() {
   const active = [];
-  if (fields.search.value.trim()) active.push(`busqueda: "${fields.search.value.trim()}"`);
+  if (fields.search.value.trim()) active.push(`search: "${fields.search.value.trim()}"`);
   if (fields.team.value) active.push(fields.team.value);
   if (fields.category.value) active.push(fields.category.value);
-  if (fields.tier.value) active.push(fields.tier.value);
-  if (fields.minPrice.value || fields.maxPrice.value) active.push(`precio ${fields.minPrice.value || "0"}-${fields.maxPrice.value || "max"}`);
-  if (fields.minValue.value || fields.maxValue.value) active.push(`value ${fields.minValue.value || "0"}-${fields.maxValue.value || "max"}`);
-  els.activeFilters.textContent = active.length ? active.join(" / ") : "Sin filtros activos";
+  if (fields.minPrice.value || fields.maxPrice.value) active.push(`price ${fields.minPrice.value || "0"}-${fields.maxPrice.value || "max"}`);
+  els.activeFilters.textContent = active.length ? active.join(" / ") : "No active filters";
 }
 
 function resetFilters() {
@@ -255,14 +243,10 @@ async function init() {
 
   populateSelect(fields.team, uniqueSorted("Team"));
   populateSelect(fields.category, uniqueSorted("Category"));
-  populateSelect(fields.tier, ["Excellent", "Great", "Good", "Average", "Poor"]);
 
   const prices = state.riders.map((rider) => rider.Price);
-  const values = state.riders.map((rider) => rider.Value);
   fields.minPrice.placeholder = Math.min(...prices);
   fields.maxPrice.placeholder = Math.max(...prices);
-  fields.minValue.placeholder = Math.min(...values).toFixed(1);
-  fields.maxValue.placeholder = Math.max(...values).toFixed(1);
 
   Object.values(fields).forEach((field) => field.addEventListener("input", filterRiders));
   els.reset.addEventListener("click", resetFilters);
@@ -274,5 +258,5 @@ async function init() {
 
 init().catch((error) => {
   console.error(error);
-  els.body.innerHTML = '<tr><td colspan="11" class="empty">No se pudo cargar la base de datos.</td></tr>';
+  els.body.innerHTML = '<tr><td colspan="12" class="empty">No se pudo cargar la base de datos.</td></tr>';
 });
