@@ -237,7 +237,7 @@ function downloadFilteredCsv() {
 }
 
 async function init() {
-  const response = await fetch("assets/riders_tdf_2026_with_jersey_numbers.csv");
+  const response = await fetch("assets/riders_tdf_2026_with_jersey_numbers.csv?v=20260704-wide-pcs");
   const csv = await response.text();
   state.riders = parseCsv(csv);
 
