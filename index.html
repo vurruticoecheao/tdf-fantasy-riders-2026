@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tour de France Fantasy Riders 2026</title>
+  <meta name="description" content="Base interactiva de riders del Tour de France Fantasy 2026 con filtros, ranking y exportacion.">
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">Tour de France 2026</p>
+      <h1>Fantasy Riders Database</h1>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-button" id="downloadCsv" type="button" title="Descargar CSV filtrado" aria-label="Descargar CSV filtrado">
+        <span aria-hidden="true">CSV</span>
+      </button>
+      <button class="text-button" id="resetFilters" type="button">Limpiar filtros</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="stats-grid" aria-label="Resumen de datos">
+      <article class="metric">
+        <span class="metric-label">Riders visibles</span>
+        <strong id="visibleCount">0</strong>
+      </article>
+      <article class="metric">
+        <span class="metric-label">Precio promedio</span>
+        <strong id="avgPrice">0</strong>
+      </article>
+      <article class="metric">
+        <span class="metric-label">Valor promedio</span>
+        <strong id="avgValue">0</strong>
+      </article>
+      <article class="metric">
+        <span class="metric-label">Top value</span>
+        <strong id="topValue">-</strong>
+      </article>
+    </section>
+
+    <section class="workspace">
+      <aside class="filters" aria-label="Filtros">
+        <div class="filter-block">
+          <label for="searchInput">Buscar</label>
+          <input id="searchInput" type="search" placeholder="Nombre, equipo o dorsal">
+        </div>
+
+        <div class="filter-block">
+          <label for="teamFilter">Equipo</label>
+          <select id="teamFilter">
+            <option value="">Todos los equipos</option>
+          </select>
+        </div>
+
+        <div class="filter-block">
+          <label for="categoryFilter">Categoria</label>
+          <select id="categoryFilter">
+            <option value="">Todas las categorias</option>
+          </select>
+        </div>
+
+        <div class="filter-block">
+          <label for="tierFilter">Tier</label>
+          <select id="tierFilter">
+            <option value="">Todos los tiers</option>
+          </select>
+        </div>
+
+        <div class="filter-row">
+          <div class="filter-block">
+            <label for="minPrice">Precio min.</label>
+            <input id="minPrice" type="number" min="0" step="1">
+          </div>
+          <div class="filter-block">
+            <label for="maxPrice">Precio max.</label>
+            <input id="maxPrice" type="number" min="0" step="1">
+          </div>
+        </div>
+
+        <div class="filter-row">
+          <div class="filter-block">
+            <label for="minValue">Value min.</label>
+            <input id="minValue" type="number" min="0" step="0.1">
+          </div>
+          <div class="filter-block">
+            <label for="maxValue">Value max.</label>
+            <input id="maxValue" type="number" min="0" step="0.1">
+          </div>
+        </div>
+
+        <div class="filter-block">
+          <label for="sortSelect">Ordenar por</label>
+          <select id="sortSelect">
+            <option value="value-desc">Value: mayor a menor</option>
+            <option value="price-asc">Precio: menor a mayor</option>
+            <option value="price-desc">Precio: mayor a menor</option>
+            <option value="pcs-desc">PCS 2026: mayor a menor</option>
+            <option value="rank-asc">PCS Rank: mejor ranking</option>
+            <option value="jersey-asc">Dorsal: ascendente</option>
+            <option value="name-asc">Rider: A-Z</option>
+          </select>
+        </div>
+      </aside>
+
+      <section class="table-panel" aria-label="Tabla de riders">
+        <div class="table-toolbar">
+          <div>
+            <h2>Riders</h2>
+            <p id="activeFilters">Sin filtros activos</p>
+          </div>
+          <div class="legend">
+            <span><i class="tier-dot excellent"></i>Excellent</span>
+            <span><i class="tier-dot great"></i>Great</span>
+            <span><i class="tier-dot good"></i>Good</span>
+            <span><i class="tier-dot average"></i>Average</span>
+            <span><i class="tier-dot poor"></i>Poor</span>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Dorsal</th>
+                <th>Rider</th>
+                <th>Equipo</th>
+                <th>Categoria</th>
+                <th>PCS 2026</th>
+                <th>PCS 12m</th>
+                <th>Wins</th>
+                <th>Value</th>
+                <th>Tier</th>
+                <th>Precio</th>
+                <th>PCS Rank</th>
+              </tr>
+            </thead>
+            <tbody id="ridersBody">
+              <tr>
+                <td colspan="11" class="loading">Cargando riders...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer>
+    <span>Datos base: Fantasy TdF Helper + dorsales oficiales de letour.fr.</span>
+    <span id="lastUpdated"></span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
